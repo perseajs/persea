@@ -11,9 +11,6 @@ import { loadGlobalMiddleware } from './middleware';
 import { init }                 from './init';
 import { start }                from './start';
 
-cluster.on('exit', (worker, code, signal) => {
-    console.log(`Worker ${worker.process.pid} died`);
-});
 
 export function runWorkers (port : number) {
     if (cluster.isMaster === false) {
@@ -25,6 +22,15 @@ export function runWorkers (port : number) {
             const worker = cluster.fork({ CMD_RUN_WORKER: 'true', PORT: port });
             workers.push(worker);
     }
+
+    // self-healing
+    cluster.on('exit', (worker, code, signal) => {
+        console.log(`Worker ${worker.process.pid} died`);
+        const indexOfOldWorker = workers.indexOf(worker);
+
+        const newWorker = cluster.fork({ CMD_RUN_WORKER: 'true', PORT: port });
+        workers.splice(indexOfOldWorker, 1, newWorker);
+    });
 
     return workers;
 }
@@ -45,37 +51,26 @@ export function dev (port : number) {
     fs.watch(cwd, { recursive: true }, (eventType, filename) => {
         if (lock) { return; }
         if ((Date.now() - lastStartAt) < 1000) { return; }
-        if (require.cache[path.resolve(cwd, filename)] === undefined) { return; }
 
-        lock = true;
-        console.log(`Detected change:, ${filename}`);
-        console.log('Reloading workers');
-        while (workers.length) {
-            const worker = workers.shift();
-            worker.kill();
-        }
-        workers = runWorkers(port);
-
+        // TODO: work out how to check when a new file is written
         // re-load the dependencies, in case there are new modules required
         init();
         loadRoutes();
         loadGlobalMiddleware();
 
+        if (require.cache[path.resolve(cwd, filename)] === undefined) { return; }
+
+        lock = true;
+        console.log(`Detected change: ${filename}`);
+        console.log('Reloading workers');
+        const workersToKill = Array.from(workers);
+        for (const worker of workersToKill) {
+            worker.kill();
+        }
+
         lastStartAt = Date.now();
         lock = false;
     });
-}
-
-export async function initProject () {
-    // check if cwd is empty
-
-    // package.json
-    // src/
-    //    /init.js
-    //    /middleware.js
-    //    /routes/v1/hello.js
-
-    // yarn | npm add persea
 }
 
 if (process.env.CMD_RUN_WORKER === 'true') {
@@ -89,6 +84,6 @@ if (process.env.CMD_RUN_WORKER === 'true') {
     dev(Number(process.env.PORT));
 } else {
     console.log(`
-usage: PORT=8080 persea run
+usage: PORT=8080 persea run|dev
                 `.trim());
 }
