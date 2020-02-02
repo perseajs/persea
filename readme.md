@@ -1,6 +1,6 @@
-<div style="display: flex; justify-content: center;">
+<p align="center">
     <img width="532" alt="persea logo" src="https://user-images.githubusercontent.com/60553092/73610503-05a7eb80-45a6-11ea-8201-c45ab7c608c5.png">
-</div>
+</p>
 
 An intentionally simple and quick http server.
 
