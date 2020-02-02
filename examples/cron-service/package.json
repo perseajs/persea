@@ -1,0 +1,13 @@
+{
+  "name": "cron-service",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "cron-parser": "^2.13.0",
+    "knex": "^0.20.8",
+    "node-fetch": "^2.6.0",
+    "persea": "../../dist",
+    "pg": "^7.18.1"
+  }
+}

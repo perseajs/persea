@@ -1,0 +1,31 @@
+version: "3.7"
+services:
+
+services:
+  app:
+    image: node:12
+    command: node index.js
+    environment:
+      - PORT=80
+      - DB_URI=postgres://postgres@db/postgres
+    depends_on:
+      - db
+    ports:
+      - 1111:80
+    working_dir: /app
+    volumes:
+      - ./:/app
+
+  worker:
+    image: node:12
+    command: node worker.js
+    environment:
+      - DB_URI=postgres://postgres@db/postgres
+    depends_on:
+      - db
+    working_dir: /app
+    volumes:
+      - ./:/app
+
+  db:
+    image: postgres

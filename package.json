@@ -1,0 +1,23 @@
+{
+  "name": "@persea/persea",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "bin": "dist/bin.js",
+  "author": "Lawrence Wakefield <lawrence@iamlawrence.me>",
+  "license": "MIT",
+  "scripts": {
+    "test": "ls test/*.ts | xargs -n1 -I % yarn ts-node %",
+    "build": "tsc",
+    "build-docs": "typedoc src --out docs --excludeNotExported --theme minimal"
+  },
+  "files": [
+    "src/**",
+    "dist/**"
+  ],
+  "devDependencies": {
+    "@types/node": "^13.7.0",
+    "ts-node": "^8.6.2",
+    "typedoc": "^0.16.9",
+    "typescript": "^3.7.5"
+  }
+}
