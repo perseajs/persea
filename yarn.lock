@@ -3,9 +3,9 @@
 
 
 "@persea/laura@^0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@persea/laura/-/laura-0.1.0.tgz#7ae1b06ea67956bf7708bbcbaaba881c89436089"
-  integrity sha512-CBz6ZQ61AZl0zOYMRo4S5lMRWXawt8zki+dXjvJgqc6jjDPacl5PSCxFl7n9yZqEojLntT1mGYO7l1qRrDMw4g==
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@persea/laura/-/laura-0.1.1.tgz#d1de6a4ff27e5689eb25778795e6db8a8edd541f"
+  integrity sha512-uQPnfztqdtF11o4CjZBYJVi2jrzm44LhgluiNF0yoOG54RhWlW+ZTtxmN53LyelQnbV+eHN78dC1IPH+C0yBag==
 
 "@types/minimatch@3.0.3":
   version "3.0.3"
@@ -214,9 +214,9 @@ rechoir@^0.6.2:
     resolve "^1.1.6"
 
 resolve@^1.1.6:
-  version "1.15.0"
-  resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.15.0.tgz#1b7ca96073ebb52e741ffd799f6b39ea462c67f5"
-  integrity sha512-+hTmAldEGE80U2wJJDC1lebb5jWqvTYAfm3YZ1ckk1gBr0MnCqUKlwK1e+anaFljIl+F5tR5IoZcm4ZDA1zMQw==
+  version "1.15.1"
+  resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.15.1.tgz#27bdcdeffeaf2d6244b95bb0f9f4b4653451f3e8"
+  integrity sha512-84oo6ZTtoTUpjgNEr5SJyzQhzL72gaRodsSfyxC/AXRvwu0Yse9H8eF9IpGo7b8YetZhlI6v7ZQ6bKBFV/6S7w==
   dependencies:
     path-parse "^1.0.6"
 
