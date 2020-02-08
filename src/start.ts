@@ -59,7 +59,6 @@ export async function start (port : number): Promise<http.Server> {
 
         } catch (e) {
             globalMiddleware.error(e);
-            Response.send({ status: 500 });
         }
     }).listen(port);
 };
