@@ -115,7 +115,7 @@ export class Response {
         } : {
             status? : number;
             body? : string;
-            json? : object;
+            json? : unknown;
             headers? : object;
         }
     ) {

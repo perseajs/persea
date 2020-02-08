@@ -2,7 +2,7 @@ import * as http   from 'http';
 import * as assert from 'assert';
 
 import { get, set } from '../src/context';
-import {request, sleep, randInt } from './util';
+import { request, sleep, randInt } from './util';
 
 // async_hooks interact with the runtime of node, which makes this a little
 // tricky to test. Ideally, we would be able to introspect the contexts object
@@ -31,7 +31,7 @@ import {request, sleep, randInt } from './util';
 // we expect the context of A to be returned by A and not that of another
 // request.
 
-(async () => {
+test('async_hooks isolates request contexts', async () => {
     const port = randInt(10_000, 65_536);
 
     const server = http.createServer((req, res) => {
@@ -58,4 +58,4 @@ import {request, sleep, randInt } from './util';
 
     assert(Number(res0.body) < Number(res1.body));
     assert(Number(res1.body) < Number(res2.body));
-})();
+});

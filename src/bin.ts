@@ -12,7 +12,25 @@ import { init }                 from './init';
 import { start }                from './start';
 
 
-export function runWorkers (port : number) {
+/*
+ * This function starts env.NUM_WORKERS worker processes. Each worker process
+ * listens on env.PORT serving the persea application.
+ *
+ * Each worker is self-healing: if it dies, another process will be created in
+ * it's place.
+ *
+ * @returns The return value is a reference to the array of currently alive
+ * workers. When a worker process is restarted, the reference to that worker is
+ * updated. See the example below.
+ *
+ * ```typescript
+ * const workers = runWorkers(8080)
+ * console.log(workers[0].pid) // 1
+ * workers[0].kill();
+ * console.log(workers[0].pid) // 2
+ * ```
+ */
+export function runWorkers (port : number): Array<cluster.Worker> {
     if (cluster.isMaster === false) {
         throw new Error('runWorkers should only be called by the master');
     }
@@ -23,7 +41,6 @@ export function runWorkers (port : number) {
             workers.push(worker);
     }
 
-    // self-healing
     cluster.on('exit', (worker, code, signal) => {
         console.log(`Worker ${worker.process.pid} died`);
         const indexOfOldWorker = workers.indexOf(worker);
@@ -52,8 +69,6 @@ export function dev (port : number) {
         if (lock) { return; }
         if ((Date.now() - lastStartAt) < 1000) { return; }
 
-        // TODO: work out how to check when a new file is written
-        // re-load the dependencies, in case there are new modules required
         init();
         loadRoutes();
         loadGlobalMiddleware();
@@ -73,17 +88,33 @@ export function dev (port : number) {
     });
 }
 
-if (process.env.CMD_RUN_WORKER === 'true') {
-    start(Number(process.env.PORT));
-    console.log(`Worker ${process.pid} started`);
-} else if (process.argv.includes('run')) {
-    console.log(`Master ${process.pid} is running`);
-    runWorkers(Number(process.env.PORT));
-} else if (process.argv.includes('dev')) {
-    console.log(`Master ${process.pid} is running`);
-    dev(Number(process.env.PORT));
-} else {
-    console.log(`
+function main () {
+    process.env.PORT = process.env.PORT || '8080';
+
+    if (process.env.CMD_RUN_WORKER === 'true') {
+
+        start(Number(process.env.PORT));
+        console.log(`Worker ${process.pid} started`);
+
+    } else if (process.argv.includes('run')) {
+
+        console.log(`Master ${process.pid} is running`);
+        console.log(`Listening on ${process.env.PORT}`);
+        runWorkers(Number(process.env.PORT));
+
+    } else if (process.argv.includes('dev')) {
+
+        console.log(`Master ${process.pid} is running`);
+        console.log(`Listening on ${process.env.PORT}`);
+        dev(Number(process.env.PORT));
+
+    } else {
+
+        console.log(`
 usage: PORT=8080 persea run|dev
-                `.trim());
+        `.trim());
+
+    }
 }
+
+main();

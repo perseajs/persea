@@ -39,26 +39,57 @@ A route file looks like this:
 // routes/v1/books.js
 
 // GET /v1/books
-export async function index () {
+module.exports.index = async function index () {
   response.send({ json: await getAllBooks() });
 }
 // POST /v1/books
-export async function create () {
+module.exports.create = async function create () {
   response.send({ status: 201, json: await createBook(request.json) });
 }
 // GET /v1/books/$id
-export async function show (id) {
+module.exports.show = async function show (id) {
   response.send({ json: await getBook(id) });
 }
 // PUT|PATCH /v1/books/$id
-export async function update (id) {
+module.exports.update = async function update (id) {
   response.send({ json: await updateBook(id, request.json) });
 }
 // DELETE /v1/books/$id
-export async function destroy (id) {
+module.exports.destroy = async function destroy (id) {
   await deleteBook(id);
   response.send({ status: 204 });
 }
+```
+
+If you save the above file to `routes/v1/urls.js`, `persea` will detect the new file and restart the server:
+
+```
+Detected change: routes/v1/urls1.js
+Reloading workers
+Worker 32179 died
+Worker 32180 died
+Worker 32181 died
+Worker 32182 died
+Worker 32183 died
+Worker 32184 died
+Worker 32186 died
+Worker 32187 died
+Worker 32185 died
+Worker 32188 died
+Worker 32189 died
+Worker 32190 died
+Worker 32422 started
+Worker 32425 started
+Worker 32424 started
+Worker 32427 started
+Worker 32423 started
+Worker 32426 started
+Worker 32430 started
+Worker 32431 started
+Worker 32429 started
+Worker 32434 started
+Worker 32435 started
+Worker 32436 started
 ```
 
 Requirements
