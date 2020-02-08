@@ -43,7 +43,7 @@ export async function start (port : number): Promise<http.Server> {
     const routeTable       = loadRoutes();
     const globalMiddleware = loadGlobalMiddleware();
 
-    return server(() => {
+    return server(async () => {
         try {
             const [ path ] = Request.url.split('?');
             const matchedRoute = routeTable.match(Request.method, path)
@@ -51,7 +51,7 @@ export async function start (port : number): Promise<http.Server> {
             globalMiddleware.before();
             if (matchedRoute) {
                 const { match, handler } = matchedRoute;
-                handler((match.groups || {}).id);
+                await handler((match.groups || {}).id);
             } else {
                 Response.send({ status: 404 });
             }
