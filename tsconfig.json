@@ -9,6 +9,7 @@
     "lib":    [ "ES2018" ],
     "sourceMap": true,
     "module": "commonjs",
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "declaration": true
   }
 }
