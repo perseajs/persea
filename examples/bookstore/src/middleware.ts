@@ -13,3 +13,17 @@ export function after () {
     console.log(`${new Date().toISOString()} ${requestId} <- ${Request.method} ${Request.url}`);
  };
 
+
+export function error (e) {
+    if (e.message === 'Not Found') {
+        Response.send({ status: 404 });
+    } else if (e.message === 'Not Allowed') {
+        Response.send({ status: 403 });
+    } else {
+        console.error(e);
+        Response.send({ status: 500 });
+    }
+
+    const requestId = context.get('requestId');
+    console.log(`${new Date().toISOString()} ${requestId} <- ${Request.method} ${Request.url}`);
+}

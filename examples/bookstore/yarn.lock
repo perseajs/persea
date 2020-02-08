@@ -3,9 +3,9 @@
 
 
 "@persea/persea@^0.1.1":
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/@persea/persea/-/persea-0.1.4.tgz#a4f8500cb017209b5945818afbc1f9bc56258305"
-  integrity sha512-cIBrDNaHLidW80seoNIYOcgJbuvuqICQd81seCD3FbcicHA4t2znjwkp3q90oaHiHZNft+nnjUs+2w4bopfDOQ==
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@persea/persea/-/persea-0.1.5.tgz#e26c2c2e5187c4eec2909999c7327f5cb790555d"
+  integrity sha512-c6WusgA+dopk1hUu2TcyjCp1AC3CtlVkS7kUcBfT6msq6yTW5HzZiyMOUbEcJzThj73kJO/fl+NQWVliM35c7A==
 
 "@types/node@^13.7.0":
   version "13.7.0"
