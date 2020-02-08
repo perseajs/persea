@@ -1,10 +1,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
+import { Response } from './server';
+
 export function loadGlobalMiddleware (envPath = process.cwd()) {
     let before = () => {};
     let after = () => {};
     let error = (e) => {
+        console.error(e);
         Response.send({ status: 500 });
     };
 
