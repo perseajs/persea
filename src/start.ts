@@ -53,7 +53,7 @@ export async function start (port : number): Promise<http.Server> {
                 const { match, handler } = matchedRoute;
                 await handler((match.groups || {}).id);
             } else {
-                Response.send({ status: 404 });
+                Response.send({ status: 404, body: 'Not Found' });
             }
             globalMiddleware.after();
 
