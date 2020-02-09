@@ -35,7 +35,7 @@ export function runWorkers (): Array<cluster.Worker> {
     }
 
     const workers = [];
-    for (let i = 0; i < Number(process.env.NUM_WORKERS); i++) {
+    for (let i = 0; i < Number(process.env.WORKERS); i++) {
             const worker = cluster.fork({ CMD_RUN_WORKER: 'true', ...process.env });
             workers.push(worker);
     }
