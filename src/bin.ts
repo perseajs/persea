@@ -35,7 +35,7 @@ export function runWorkers (): Array<cluster.Worker> {
     }
 
     const workers = [];
-    for (let i = 0; i < os.cpus().length; i++) {
+    for (let i = 0; i < Number(process.env.NUM_WORKERS); i++) {
             const worker = cluster.fork({ CMD_RUN_WORKER: 'true', ...process.env });
             workers.push(worker);
     }
@@ -102,8 +102,9 @@ function main () {
         require(option('require'));
     }
 
-    process.env.PORT     = option('port') || process.env.PORT     || '8080';
-    process.env.WORK_DIR = option('dir')  || process.env.WORK_DIR || process.cwd();
+    process.env.PORT     = option('port')    || process.env.PORT     || '8080';
+    process.env.WORK_DIR = option('dir')     || process.env.WORK_DIR || process.cwd();
+    process.env.WORKERS  = option('workers') || process.env.WORKERS  || os.cpus().length.toString();
 
     if (process.env.CMD_RUN_WORKER === 'true') {
 
@@ -126,8 +127,9 @@ function main () {
 
         console.info(`
 usage: persea run|dev
-  --port=<number>    Port for the http server to bind to
-  --dir=<string>     Directory containing init, routes and middleware
+  --port=<number>    Port for the http server to bind to, defaults to 8080
+  --dir=<string>     Directory containing init, routes and middleware, defaults to pwd
+  --workers=<number> Specify number of workers to use, defaults to num of cpus
   --require=<string> Module to require before booting
         `.trim());
 

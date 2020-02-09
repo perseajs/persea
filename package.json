@@ -1,6 +1,6 @@
 {
   "name": "@persea/persea",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "main": "dist/index.js",
   "bin": "dist/bin.js",
   "author": "Lawrence Wakefield <lawrence@iamlawrence.me>",
