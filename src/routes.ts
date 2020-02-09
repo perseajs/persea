@@ -18,8 +18,9 @@ export class RouteTable extends Map<RegExp, Function> {
     }
 }
 
-export function loadRoutes (envPath = process.cwd()): RouteTable {
-    const routeDir = path.resolve(envPath, 'routes');
+export function loadRoutes (): RouteTable {
+    const routeDir = path.resolve(process.env.WORK_DIR, 'routes');
+
     const routes = readDir(routeDir);
 
     const routeTable = new RouteTable();
