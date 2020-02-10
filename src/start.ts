@@ -48,17 +48,17 @@ export async function start (port : number): Promise<http.Server> {
             const [ path ] = Request.url.split('?');
             const matchedRoute = routeTable.match(Request.method, path)
 
-            globalMiddleware.before();
+            await globalMiddleware.before();
             if (matchedRoute) {
                 const { match, handler } = matchedRoute;
                 await handler((match.groups || {}).id);
             } else {
                 Response.send({ status: 404 });
             }
-            globalMiddleware.after();
+            await globalMiddleware.after();
 
         } catch (e) {
-            globalMiddleware.error(e);
+            await globalMiddleware.error(e);
         }
     }).listen(port);
 };

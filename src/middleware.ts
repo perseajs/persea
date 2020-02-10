@@ -4,9 +4,9 @@ import * as path from 'path';
 import { Response } from './server';
 
 export function loadGlobalMiddleware (envPath = process.cwd()) {
-    let before = () => {};
-    let after = () => {};
-    let error = (e) => {
+    let before = async () => {};
+    let after = async () => {};
+    let error = async (e) => {
         console.error(e);
         Response.send({ status: 500 });
     };
