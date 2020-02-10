@@ -3,11 +3,17 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "dev": "persea --require=ts-node/register --dir=src dev",
+    "build": "tsc",
+    "start": "persea --dir=dist run"
+  },
   "dependencies": {
     "@persea/persea": "^0.1.1"
   },
   "devDependencies": {
     "@types/node": "^13.7.0",
+    "ts-node": "^8.6.2",
     "typescript": "^3.7.5"
   }
 }

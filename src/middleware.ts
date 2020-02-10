@@ -1,21 +1,26 @@
-import * as fs from 'fs';
 import * as path from 'path';
 
 import { Response } from './server';
 
-export function loadGlobalMiddleware (envPath = process.cwd()) {
+export function loadGlobalMiddleware () {
     let before = async () => {};
     let after = async () => {};
-    let error = async (e) => {
+    let error = async (e : Error) => {
         console.error(e);
         Response.send({ status: 500 });
     };
 
-    if (fs.existsSync(path.resolve(envPath, 'middleware.js'))) {
-        const middleware = require(path.resolve(envPath, 'middleware.js'));
+    const cwd = process.env.WORK_DIR;
+
+    try {
+        const middleware = require(path.resolve(cwd, 'middleware'))
         if (middleware.before) { before = middleware.before; }
         if (middleware.after)  { after  = middleware.after;  }
         if (middleware.error)  { error  = middleware.error;  }
+    } catch (e) {
+        if (/Cannot find module/.test(e) === false) {
+            throw e;
+        }
     }
 
     return { before, after, error };

@@ -5,7 +5,6 @@ import * as os from 'os';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import './index';
 import { loadRoutes }           from './routes';
 import { loadGlobalMiddleware } from './middleware';
 import { init }                 from './init';
@@ -30,14 +29,14 @@ import { start }                from './start';
  * console.log(workers[0].pid) // 2
  * ```
  */
-export function runWorkers (port : number): Array<cluster.Worker> {
+export function runWorkers (): Array<cluster.Worker> {
     if (cluster.isMaster === false) {
         throw new Error('runWorkers should only be called by the master');
     }
 
     const workers = [];
-    for (let i = 0; i < os.cpus().length; i++) {
-            const worker = cluster.fork({ CMD_RUN_WORKER: 'true', PORT: port });
+    for (let i = 0; i < Number(process.env.WORKERS); i++) {
+            const worker = cluster.fork({ CMD_RUN_WORKER: 'true', ...process.env });
             workers.push(worker);
     }
 
@@ -45,15 +44,15 @@ export function runWorkers (port : number): Array<cluster.Worker> {
         console.log(`Worker ${worker.process.pid} died`);
         const indexOfOldWorker = workers.indexOf(worker);
 
-        const newWorker = cluster.fork({ CMD_RUN_WORKER: 'true', PORT: port });
+        const newWorker = cluster.fork({ CMD_RUN_WORKER: 'true', ...process.env });
         workers.splice(indexOfOldWorker, 1, newWorker);
     });
 
     return workers;
 }
 
-export function dev (port : number) {
-    let workers = runWorkers(port);
+export function dev () {
+    let workers = runWorkers();
 
     // The master doesn't use any of the functionality in the following
     // functions. However calling them loads in all the dependencies, which we
@@ -64,7 +63,7 @@ export function dev (port : number) {
 
     let lock = false;
     let lastStartAt = Date.now();
-    const cwd = process.cwd();
+    const cwd = process.env.WORK_DIR;
     fs.watch(cwd, { recursive: true }, (eventType, filename) => {
         if (lock) { return; }
         if ((Date.now() - lastStartAt) < 1000) { return; }
@@ -88,8 +87,24 @@ export function dev (port : number) {
     });
 }
 
+function option (name : string): string | null {
+    const fullArg = process.argv.find(v => v.startsWith(`--${name}=`));
+    if (fullArg) {
+        const [ , right] = fullArg.split('=');
+        return right;
+    }
+
+    return null;
+}
+
 function main () {
-    process.env.PORT = process.env.PORT || '8080';
+    if (option('require')) {
+        require(option('require'));
+    }
+
+    process.env.PORT     = option('port')    || process.env.PORT     || '8080';
+    process.env.WORK_DIR = option('dir')     || process.env.WORK_DIR || process.cwd();
+    process.env.WORKERS  = option('workers') || process.env.WORKERS  || os.cpus().length.toString();
 
     if (process.env.CMD_RUN_WORKER === 'true') {
 
@@ -100,18 +115,22 @@ function main () {
 
         console.log(`Master ${process.pid} is running`);
         console.log(`Listening on ${process.env.PORT}`);
-        runWorkers(Number(process.env.PORT));
+        runWorkers();
 
     } else if (process.argv.includes('dev')) {
 
         console.log(`Master ${process.pid} is running`);
         console.log(`Listening on ${process.env.PORT}`);
-        dev(Number(process.env.PORT));
+        dev();
 
     } else {
 
-        console.log(`
-usage: PORT=8080 persea run|dev
+        console.info(`
+usage: persea run|dev
+  --port=<number>    Port for the http server to bind to, defaults to 8080
+  --dir=<string>     Directory containing init, routes and middleware, defaults to pwd
+  --workers=<number> Specify number of workers to use, defaults to num of cpus
+  --require=<string> Module to require before booting
         `.trim());
 
     }

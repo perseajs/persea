@@ -4,7 +4,8 @@ import * as path   from 'path';
 import { loadRoutes } from '../src/routes';
 
 test('loadRoutes sets the correct keys', () => {
-    const routeTable = loadRoutes(path.resolve(__dirname, 'fixtures'));
+    process.env.WORK_DIR = path.resolve(__dirname, 'fixtures');
+    const routeTable = loadRoutes();
 
     const paths = Array.from(routeTable.keys()).map(v => v.toString());
     assert.deepStrictEqual(paths, [
@@ -18,7 +19,8 @@ test('loadRoutes sets the correct keys', () => {
 });
 
 test('RouteTable.match correctly matches routes', () => {
-    const routeTable = loadRoutes(path.resolve(__dirname, 'fixtures'));
+    process.env.WORK_DIR = path.resolve(__dirname, 'fixtures');
+    const routeTable = loadRoutes();
 
     const testRoute = (method : string, url : string , body : string) => {
         const match = routeTable.match(method, url);
