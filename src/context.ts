@@ -51,13 +51,13 @@ asyncHook.enable();
 /**
  * Sets a value on the current request context.
  */
-export function set (key : string, val : unknown) {
+export function set (key : string|number|symbol, val : unknown) {
     contexts[ah.executionAsyncId()][key] = val;
 }
 
 /**
  * Returns a value from the current request context.
  */
-export function get (key : string) {
+export function get (key : string|number|symbol) {
     return contexts[ah.executionAsyncId()][key];
 }

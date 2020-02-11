@@ -1,6 +1,6 @@
 import * as http from 'http';
 
-import { server, Request, Response } from './server';
+import { server, request, response } from './server';
 import { loadRoutes }                from './routes';
 import { loadGlobalMiddleware }      from './middleware';
 import { init }                      from './init';
@@ -45,15 +45,15 @@ export async function start (port : number): Promise<http.Server> {
 
     return server(async () => {
         try {
-            const [ path ] = Request.url.split('?');
-            const matchedRoute = routeTable.match(Request.method, path)
+            const [ path ] = request.url.split('?');
+            const matchedRoute = routeTable.match(request.method, path)
 
             await globalMiddleware.before();
             if (matchedRoute) {
                 const { match, handler } = matchedRoute;
                 await handler((match.groups || {}).id);
             } else {
-                Response.send({ status: 404, body: 'Not Found' });
+                response.send({ status: 404 });
             }
             await globalMiddleware.after();
 

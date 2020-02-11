@@ -1,7 +1,7 @@
 import * as http from 'http';
 import * as querystring from 'querystring';
 
-import { get, set } from './context';
+import * as context from './context';
 
 
 /**
@@ -24,73 +24,86 @@ import { get, set } from './context';
  */
 export function server (handler : () => void): http.Server {
     return http.createServer(async (req, res) => {
-        set('request', req);
-        set('payload', await getBody(req));
-        set('response', res);
+        context.set('request', req);
+
+        request.body    = await getBody(req);
+        try {
+            request.json    = JSON.parse(request.body);
+        } catch (e) {
+            request.json    = null;
+        }
+        request.url     = req.url;
+        request.headers = req.headers;
+        request.method  = req.method;
+        request.query   = querystring.parse(req.url.split('?')[0]);
+
+        context.set('response', res);
 
         handler();
     });
 }
 
-async function getBody (request : http.IncomingMessage) {
+async function getBody (httpRequest : http.IncomingMessage): Promise<string> {
     return new Promise((resolve, reject) => {
         let data = '';
 
-        request.on('readable', () => {
+        httpRequest.on('readable', () => {
             let chunk : String;
-            while (chunk = request.read()) {
+            while (chunk = httpRequest.read()) {
                 data += chunk;
             }
         });
 
-        request.on('end', () => {
+        httpRequest.on('end', () => {
             resolve(data);
         });
 
-        request.on('error', (e) => {
+        httpRequest.on('error', (e) => {
             reject(e);
         });
     });
 }
 
-
 /**
  * The Request object is context-bound to a request received by [[server]].
  */
-export class Request {
-    static get body (): string {
-        return get('payload');
-    }
-
-    /**
-     * The decoded json from the request body. Assumes the content-type is json.
-     */
-    static get json (): object {
-        return JSON.parse(get('payload'));
-    }
-
-    static get headers (): object {
-        return get('request').headers;
-    }
-
-    static get method (): string {
-        return get('request').method;
-    }
-
-    static get url (): string {
-        return get('request').url;
-    }
-
-    static get query (): object {
-        const [ , queryString ] = get('request').url.split('?');
-        return querystring.parse(queryString);
-    }
+export interface Request {
+    body:    string;
+    json:    object | null;
+    headers: object;
+    method:  string;
+    url:     string;
+    query:   object;
 }
+export const request: Request = new Proxy({
+    body: '',
+    json: null,
+    headers: {},
+    method: '',
+    url: '',
+    query: {}
+}, {
+    get (_, prop) {
+        return context.get(prop);
+    },
+    set (_, prop, value) {
+        context.set(prop, value);
+        return true;
+    }
+});
 
 /**
  * The Response object is context-bound to a request received by [[server]].
  */
-export class Response {
+export interface Response {
+    send: (opt: {
+        status? : number;
+        body? : string;
+        json? : unknown;
+        headers? : object;
+    }) => void;
+}
+export const response: Response = {
     /**
      * Sends the response to the client.
      *
@@ -106,7 +119,7 @@ export class Response {
      * opts.json defaults to null
      * opts.headers defaults to {}
      */
-    static send (
+    send (
         {
             status = 200,
             body = '',
@@ -119,10 +132,7 @@ export class Response {
             headers? : object;
         }
     ) {
-        // const {
-        // } = options;
-
-        const response = get('response');
+        const response = context.get('response');
         if (json) {
             response.writeHead(status, { ...headers, 'content-type': 'application/json' });
             response.end(JSON.stringify(json));
@@ -131,4 +141,4 @@ export class Response {
             response.end(body);
         }
     }
-}
+};

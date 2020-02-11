@@ -1,7 +1,7 @@
 import * as assert from 'assert';
 import * as http from 'http';
 
-import { server, Request, Response } from '../src/server';
+import { server, request, response } from '../src/server';
 
 import * as util from './util';
 
@@ -25,7 +25,7 @@ async function closeServer (s : http.Server) {
 
 test('server can echo request body', async () => {
     const server = await setupServer(() => {
-        Response.send({ body: Request.body });
+        response.send({ body: request.body });
     });
     const res = await util.post(
         `http://localhost:${port}`,
@@ -38,7 +38,7 @@ test('server can echo request body', async () => {
 
 test('server can echo request headers', async () => {
     const server = await setupServer(() => {
-        Response.send({ body: JSON.stringify(Request.headers) });
+        response.send({ body: JSON.stringify(request.headers) });
     });
     const res = await util.get(
         `http://localhost:${port}`,
@@ -51,7 +51,7 @@ test('server can echo request headers', async () => {
 
 test('Response.send can serialize json', async () => {
     const server = await setupServer(() => {
-        Response.send({ json: Request.body });
+        response.send({ json: request.body });
     });
     const res = await util.post(
         `http://localhost:${port}`,
