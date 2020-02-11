@@ -35,7 +35,7 @@ export function server (handler : () => void): http.Server {
         request.url     = req.url;
         request.headers = req.headers;
         request.method  = req.method;
-        request.query   = querystring.parse(req.url.split('?')[0]);
+        request.query   = querystring.parse(req.url.split('?')[1]);
 
         context.set('response', res);
 
@@ -76,12 +76,12 @@ export interface Request {
     query:   object;
 }
 export const request: Request = new Proxy({
-    body: '',
-    json: null,
+    body:    '',
+    json:    null,
     headers: {},
-    method: '',
-    url: '',
-    query: {}
+    method:  '',
+    url:     '',
+    query:   {}
 }, {
     get (_, prop) {
         return context.get(prop);
