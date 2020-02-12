@@ -61,3 +61,29 @@ test('Response.send can serialize json', async () => {
     assert.equal(res.body, `"hello world"`)
     await closeServer(server);
 });
+
+test('can set response.header before callnig response.send', async () => {
+    const server = await setupServer(() => {
+        response.headers['x-foo'] = 'foo';
+        response.send({ json: request.body });
+    });
+    const res = await util.post(
+        `http://localhost:${port}`,
+        'hello world',
+    );
+    assert.equal(res.headers['x-foo'], 'foo');
+});
+
+test('can get response.status after calling response.send', async () => {
+    let status;
+    const server = await setupServer(() => {
+        response.headers['x-foo'] = 'foo';
+        response.send({ json: request.body, status: 201 });
+        status = response.status;
+    });
+    const res = await util.post(
+        `http://localhost:${port}`,
+        'hello world',
+    );
+    assert.equal(status, 201);
+});

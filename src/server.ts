@@ -37,6 +37,7 @@ export function server (handler : () => void): http.Server {
         request.method  = req.method;
         request.query   = querystring.parse(req.url.split('?')[1]);
 
+        context.set('response.headers', {});
         context.set('response', res);
 
         handler();
@@ -84,10 +85,10 @@ export const request: Request = new Proxy({
     query:   {}
 }, {
     get (_, prop) {
-        return context.get(prop);
+        return context.get(`request.${prop.toString()}`);
     },
     set (_, prop, value) {
-        context.set(prop, value);
+        context.set(`request.${prop.toString()}`, value);
         return true;
     }
 });
@@ -96,6 +97,8 @@ export const request: Request = new Proxy({
  * The Response object is context-bound to a request received by [[server]].
  */
 export interface Response {
+    status: number;
+    headers: object;
     send: (opt: {
         status? : number;
         body? : string;
@@ -104,6 +107,14 @@ export interface Response {
     }) => void;
 }
 export const response: Response = {
+    get status () {
+        return context.get('response').statusCode;
+    },
+
+    get headers () {
+        return context.get('response.headers');
+    },
+
     /**
      * Sends the response to the client.
      *
@@ -134,10 +145,14 @@ export const response: Response = {
     ) {
         const response = context.get('response');
         if (json) {
-            response.writeHead(status, { ...headers, 'content-type': 'application/json' });
+            response.writeHead(status, {
+                ...context.get('response.headers'),
+                ...headers,
+                'content-type': 'application/json'
+            });
             response.end(JSON.stringify(json));
         } else {
-            response.writeHead(status, headers);
+            response.writeHead(status, { ...context.get('response.headers'), ...response.headers });
             response.end(body);
         }
     }
