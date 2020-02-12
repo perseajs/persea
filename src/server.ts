@@ -144,15 +144,15 @@ export const response: Response = {
         }
     ) {
         const response = context.get('response');
+
+        Object.assign(context.get('response.headers'), headers);
+
         if (json) {
-            response.writeHead(status, {
-                ...context.get('response.headers'),
-                ...headers,
-                'content-type': 'application/json'
-            });
+            Object.assign(context.get('response.headers'), { 'content-type': 'application/json' });
+            response.writeHead(status, context.get('response.headers'));
             response.end(JSON.stringify(json));
         } else {
-            response.writeHead(status, { ...context.get('response.headers'), ...response.headers });
+            response.writeHead(status, context.get('response.headers'));
             response.end(body);
         }
     }
