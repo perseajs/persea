@@ -9,6 +9,7 @@ import { loadRoutes }           from './routes';
 import { loadGlobalMiddleware } from './middleware';
 import { init }                 from './init';
 import { start }                from './start';
+import { Watcher }              from './watcher';
 
 
 /*
@@ -64,7 +65,8 @@ export function dev () {
     let lock = false;
     let lastStartAt = Date.now();
     const cwd = process.env.WORK_DIR;
-    fs.watch(cwd, { recursive: true }, (eventType, filename) => {
+
+    const onChange = (filename) => {
         if (lock) { return; }
         if ((Date.now() - lastStartAt) < 1000) { return; }
 
@@ -84,7 +86,12 @@ export function dev () {
 
         lastStartAt = Date.now();
         lock = false;
-    });
+    };
+
+    const watcher = new Watcher({ ignore: [ /node_modules/ ] });
+    watcher.on('change', onChange);
+    watcher.on('rename', onChange);
+    watcher.listen(cwd);
 }
 
 function option (name : string): string | null {
