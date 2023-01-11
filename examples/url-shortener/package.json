@@ -6,7 +6,7 @@
     "start": "persea run"
   },
   "dependencies": {
-    "knex": "^0.20.8",
+    "knex": "^2.4.0",
     "persea": "../..",
     "sqlite3": "^4.1.1"
   }
